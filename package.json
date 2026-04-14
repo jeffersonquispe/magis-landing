@@ -2,11 +2,7 @@
   "name": "fast-mode-landing",
   "version": "1.0.0",
   "description": "Magis AI Academy Landing Page",
-  "main": "index.html",
   "dependencies": {
     "@vercel/postgres": "^0.10.0"
-  },
-  "devDependencies": {
-    "vercel": "latest"
   }
 }
