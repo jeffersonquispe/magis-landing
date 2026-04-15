@@ -597,6 +597,12 @@
                     <h3 class="text-2xl font-bold text-white mb-2">¡Inscripción Exitosa!</h3>
                     <p class="text-slate-400">Revisa tu correo para confirmar tu asistencia y descargar tu E-book.</p>
                 </div>
+                
+                <!-- Error Message (Hidden by default) -->
+                <div id="errorMessage" class="hidden text-center py-4 px-6 mt-4 bg-red-500/10 border border-red-500/20 rounded-2xl">
+                    <h4 class="text-lg font-bold text-red-500 mb-1">Hubo un problema</h4>
+                    <p id="errorText" class="text-red-400 text-sm"></p>
+                </div>
             </div>
         </div>
     </section>
@@ -628,6 +634,9 @@
         // Form Validation Logic
         const form = document.getElementById('registrationForm');
         const successMessage = document.getElementById('successMessage');
+
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -661,6 +670,7 @@
             if (isValid) {
                 // Real API call to Vercel Serverless Function
                 form.classList.add('opacity-50', 'pointer-events-none');
+                errorMessage.classList.add('hidden');
 
                 const formData = new FormData(form);
                 const data = Object.fromEntries(formData.entries());
@@ -674,7 +684,7 @@
                 })
                     .then(async response => {
                         const result = await response.json();
-                        if (!response.ok) throw new Error(result.error || 'Error del servidor');
+                        if (!response.ok) throw new Error(result.error || 'Error desconocido del servidor');
                         return result;
                     })
                     .then(result => {
@@ -685,7 +695,8 @@
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Hubo un error al procesar tu registro. Por favor, inténtalo de nuevo.');
+                        errorText.textContent = error.message;
+                        errorMessage.classList.remove('hidden');
                         form.classList.remove('opacity-50', 'pointer-events-none');
                     });
             }
