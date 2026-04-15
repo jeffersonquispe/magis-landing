@@ -1,4 +1,7 @@
-import { db } from '@vercel/postgres';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 
 export default async function handler(request, response) {
   if (request.method !== 'POST') {
@@ -12,37 +15,34 @@ export default async function handler(request, response) {
   }
 
   try {
-    // Nota: Esto requiere que Vercel Postgres esté configurado en el dashboard del proyecto.
-    await db.sql`
-      CREATE TABLE IF NOT EXISTS leads (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        email VARCHAR(255) NOT NULL,
-        whatsapp VARCHAR(50),
-        interest VARCHAR(255),
-        data_auth BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-      );
-    `;
-
-    // Insertamos el lead
-    await db.sql`
-      INSERT INTO leads (name, email, whatsapp, interest, data_auth)
-      VALUES (${firstName}, ${email}, ${whatsapp}, ${interest}, ${data_auth === 'on' || data_auth === true});
-    `;
-
-    return response.status(200).json({ message: 'Registro exitoso' });
-  } catch (error) {
-    console.error('Error al registrar lead:', error);
-
-    // Fallback: Si no hay base de datos configurada aún, devolvemos un éxito simulado para desarrollo
-    if (error.message.includes('POSTGRES_URL')) {
-      return response.status(200).json({
-        message: 'Simulación de éxito (Falta configurar POSTGRES_URL en Vercel)',
-        data: { firstName, email, interest, whatsapp, data_auth }
+    if (!supabaseUrl || !supabaseAnonKey) {
+      return response.status(400).json({ 
+        error: 'Faltan variables SUPABASE_URL o SUPABASE_ANON_KEY' 
       });
     }
 
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+    const { data, error } = await supabase
+      .from('leads')
+      .insert([
+        { 
+          name: firstName, 
+          email: email, 
+          whatsapp: whatsapp, 
+          interest: interest, 
+          data_auth: data_auth === 'on' || data_auth === true
+        }
+      ]);
+
+    if (error) {
+      console.error('Error de Supabase:', error);
+      return response.status(500).json({ error: error.message });
+    }
+
+    return response.status(200).json({ message: 'Registro exitoso' });
+  } catch (error) {
+    console.error('Error del servidor:', error);
     return response.status(500).json({ error: 'Error interno del servidor' });
   }
 }
