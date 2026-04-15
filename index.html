@@ -672,7 +672,11 @@
                     },
                     body: JSON.stringify(data),
                 })
-                    .then(response => response.json())
+                    .then(async response => {
+                        const result = await response.json();
+                        if (!response.ok) throw new Error(result.error || 'Error del servidor');
+                        return result;
+                    })
                     .then(result => {
                         form.classList.add('hidden');
                         successMessage.classList.remove('hidden');
