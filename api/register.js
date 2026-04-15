@@ -34,12 +34,12 @@ export default async function handler(request, response) {
     return response.status(200).json({ message: 'Registro exitoso' });
   } catch (error) {
     console.error('Error al registrar lead:', error);
-    
+
     // Fallback: Si no hay base de datos configurada aún, devolvemos un éxito simulado para desarrollo
     if (error.message.includes('POSTGRES_URL')) {
-      return response.status(200).json({ 
+      return response.status(200).json({
         message: 'Simulación de éxito (Falta configurar POSTGRES_URL en Vercel)',
-        data: { firstName, email, interest, whatsapp, data_auth } 
+        data: { firstName, email, interest, whatsapp, data_auth }
       });
     }
 

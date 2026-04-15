@@ -41,14 +41,28 @@ Vercel funciona mejor cuando está conectado a un repositorio de Git para despli
 
 ---
 
-## Paso 3: Configurar Vercel Postgres
-Para que el registro funcione, necesitamos crear y vincular la base de datos.
+## Paso 3: Configurar Supabase
+Para que el registro funcione, necesitamos configurar la base de datos en Supabase.
 
-1. En el dashboard de tu proyecto recién creado en Vercel, ve a la pestaña **"Storage"**.
-2. Haz clic en **"Create Database"** y selecciona **"Postgres"**.
-3. Elige un nombre (ej. `magis-db`) y una región cercana a tus usuarios.
-4. Una vez creada, ve a la sección **"Connected Project"** y haz clic en **"Connect"**.
-5. Vercel te preguntará si quieres inyectar las variables de entorno (`POSTGRES_URL`, etc.). Confirma que sí.
+1. Ve a [Supabase](https://supabase.com) y crea un nuevo proyecto (o usa uno existente).
+2. Ve al **SQL Editor** en Supabase y ejecuta este comando para crear la tabla si aún no existe:
+   ```sql
+   CREATE TABLE IF NOT EXISTS leads (
+     id SERIAL PRIMARY KEY,
+     name VARCHAR(255) NOT NULL,
+     email VARCHAR(255) NOT NULL,
+     whatsapp VARCHAR(50),
+     interest VARCHAR(255),
+     data_auth BOOLEAN DEFAULT FALSE,
+     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+   );
+   ```
+3. Ve a **Project Settings** → **API** en tu dashboard de Supabase.
+4. Copia la `Project URL` y la `Project API Key` (la que dice `anon`, `public`).
+5. Vuelve al dashboard de Vercel de tu proyecto, ve a **Settings** → **Environment Variables**.
+6. Agrega dos variables:
+   - `SUPABASE_URL`: (Pega aquí la URL de tu proyecto)
+   - `SUPABASE_ANON_KEY`: (Pega aquí tu clave anon)
 
 ---
 
@@ -97,11 +111,11 @@ Si quieres que sea `magis-io.ai/academy`, el proceso depende de dónde esté alo
 
 > [!IMPORTANT]
 > **Error "Internal Server Error" en el registro:**
-> Asegúrate de que hiciste el "Connect" en la pestaña de Storage y que realizaste un "Redeploy". Sin las variables de entorno `POSTGRES_URL`, la función no puede comunicarse con la base de datos.
+> Asegúrate de haber agregado correctamente las variables `SUPABASE_URL` y `SUPABASE_ANON_KEY` en la configuración de Vercel y haber hecho un "Redeploy". Sin ellas, la función no puede comunicarse con tu base de datos.
 
 > [!TIP]
 > **Ver los datos registrados:**
-> Puedes ver los leads registrados yendo a la pestaña **"Storage"** → selecciona tu BD → **"Data Explorer"**. Ahí puedes ejecutar `SELECT * FROM leads;` para ver todos tus registros.
+> Puedes ver los leads registrados yendo directamente al **Table Editor** en tu dashboard de Supabase y seleccionando la tabla `leads`.
 
 ---
 
