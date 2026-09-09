@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Magis AI Academy | Domina la IA en Producción Real</title>
+    <title>MAGIS AI | Empieza por lo aburrido</title>
     <meta name="description"
-        content="Aprende a diseñar, escalar y desplegar agentes de IA y sistemas de nivel producción. De la teoría a la implementación real con expertos de la industria.">
+        content="Formación e implementación de IA para empresas de 15 a 60 personas. Te decimos qué automatizar, en qué orden y cuánto vale en horas y en soles — y qué no vale la pena tocar todavía.">
     <!-- Google Fonts: Outfit for headers, Inter for body -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,24 +20,35 @@
             theme: {
                 extend: {
                     colors: {
+                        // Aligned to the logo gradient: cyan #22d3ee -> blue #3b82f6 -> violet #a855f7
                         brand: {
-                            50: '#eef2ff',
-                            100: '#e0e7ff',
-                            200: '#c7d2fe',
-                            300: '#a5b4fc',
-                            400: '#818cf8',
-                            500: '#0052FF',
-                            600: '#4338ca',
-                            700: '#3730a3',
-                            800: '#312e81',
-                            900: '#1e1b4b',
-                            950: '#0a0a1f',
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                            950: '#0b1220',
+                        },
+                        accent: {
+                            300: '#67e8f9',
+                            400: '#22d3ee',
+                            500: '#06b6d4',
+                        },
+                        violet: {
+                            400: '#c084fc',
+                            500: '#a855f7',
+                            600: '#9333ea',
                         },
                         dark: {
-                            950: '#03050c',
-                            900: '#050914',
-                            800: '#0a0f1d',
-                            700: '#111827',
+                            950: '#050810',
+                            900: '#080c17',
+                            800: '#0d1220',
+                            700: '#141b2d',
                         }
                     },
                     fontFamily: {
@@ -60,7 +71,51 @@
     </script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- GSAP + ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+    <!-- three.js (hero signature element) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
     <style>
+        /* Pre-animation state: hide reveal targets so nothing flashes before GSAP runs.
+           Falls back to visible if JS is disabled or reduced-motion is requested. */
+        .js-anim [data-reveal],
+        .js-anim [data-hero-stagger] > * {
+            opacity: 0;
+            will-change: transform, opacity;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .js-anim [data-reveal],
+            .js-anim [data-hero-stagger] > * {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+        }
+
+        #hero-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 1.4s ease;
+            /* keep the lattice off the headline: fade it out on the left third */
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, transparent 34%, rgba(0,0,0,0.5) 48%, #000 65%);
+            mask-image: linear-gradient(to right, transparent 0%, transparent 34%, rgba(0,0,0,0.5) 48%, #000 65%);
+        }
+
+        #hero-canvas.ready { opacity: 0.4; }
+
+        @media (max-width: 1023px) {
+            #hero-canvas { display: none; }
+        }
+
+        .logo-mark path,
+        .logo-mark circle { transition: opacity .2s ease; }
+
         .glass {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(10px);
@@ -68,8 +123,20 @@
         }
 
         .hero-gradient {
-            background: radial-gradient(circle at top right, rgba(139, 92, 246, 0.15), transparent),
-                radial-gradient(circle at bottom left, rgba(76, 29, 149, 0.1), transparent);
+            /* logo gradient: violet top-right, cyan bottom-left */
+            background: radial-gradient(circle at top right, rgba(168, 85, 247, 0.14), transparent 60%),
+                radial-gradient(circle at bottom left, rgba(34, 211, 238, 0.10), transparent 55%);
+        }
+
+        .brand-sweep {
+            background-image: linear-gradient(120deg, #22d3ee 0%, #3b82f6 50%, #a855f7 100%);
+        }
+
+        .text-sweep {
+            background-image: linear-gradient(120deg, #67e8f9, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
         .text-gradient {
@@ -108,24 +175,36 @@
     </script>
 </head>
 
-<body class="bg-dark-900 text-slate-200 font-sans selection:bg-brand-500 selection:text-white">
+<body class="bg-dark-900 text-slate-200 font-sans selection:bg-brand-500 selection:text-white js-anim">
     <!-- Navbar -->
     <nav class="fixed top-0 w-full z-50 glass border-b border-white/5">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <a href="https://magis-ai.io" class="flex items-center space-x-2 group">
-                <div
-                    class="w-10 h-10 bg-brand-500 rounded-xl flex items-center justify-center shadow-lg shadow-brand-500/20 group-hover:scale-110 transition-transform">
-                    <i data-lucide="zap" class="text-white"></i>
-                </div>
-                <span class="text-xl font-display font-bold tracking-tight text-white">Magis <span
-                        class="text-brand-500 text-2xl">AI</span> Academy</span>
+            <a href="https://magis-ai.io" class="flex items-center space-x-3 group" aria-label="MAGIS AI — inicio">
+                <svg class="logo-mark w-9 h-9 shrink-0 group-hover:scale-105 transition-transform" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="magisGrad" x1="0" y1="16" x2="48" y2="16" gradientUnits="userSpaceOnUse">
+                            <stop offset="0" stop-color="#22d3ee"/>
+                            <stop offset="0.55" stop-color="#3b82f6"/>
+                            <stop offset="1" stop-color="#a855f7"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M6 26 L15 6 L24 20 L33 6 L42 26" stroke="url(#magisGrad)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="6" cy="26" r="4.5" fill="url(#magisGrad)"/>
+                    <circle cx="15" cy="6" r="4.5" fill="url(#magisGrad)"/>
+                    <circle cx="33" cy="6" r="4.5" fill="url(#magisGrad)"/>
+                    <circle cx="42" cy="26" r="4.5" fill="url(#magisGrad)"/>
+                    <circle cx="24" cy="24" r="3.2" fill="url(#magisGrad)"/>
+                </svg>
+                <span class="text-xl font-display font-bold tracking-tight text-white">MAGIS <span
+                        class="text-brand-500 text-2xl">AI</span></span>
             </a>
             <div class="hidden md:flex items-center space-x-8 text-sm font-medium">
-                <a href="#benefits" class="hover:text-brand-400 transition-colors">Beneficios</a>
-                <a href="#courses" class="hover:text-brand-400 transition-colors">Cursos</a>
+                <a href="#benefits" class="hover:text-brand-400 transition-colors">Cómo trabajamos</a>
+                <a href="#courses" class="hover:text-brand-400 transition-colors">Talleres</a>
+                <a href="#webinar" class="hover:text-brand-400 transition-colors">Webinar</a>
                 <a href="#register"
-                    class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2.5 rounded-full transition-all shadow-lg shadow-brand-500/25 active:scale-95">Comenzar
-                    Ahora</a>
+                    class="bg-brand-500 hover:bg-brand-600 text-white px-6 py-2.5 rounded-full transition-all shadow-lg shadow-brand-500/25 active:scale-95">Reservar
+                    lugar</a>
             </div>
             <button class="md:hidden text-slate-300">
                 <i data-lucide="menu"></i>
@@ -135,6 +214,8 @@
 
     <!-- Hero Section -->
     <section class="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden hero-gradient">
+        <!-- three.js signature element -->
+        <canvas id="hero-canvas" aria-hidden="true"></canvas>
         <!-- Floating Elements Background -->
         <div class="absolute top-1/4 -left-20 w-96 h-96 bg-brand-600/10 rounded-full blur-[120px] animate-pulse-slow">
         </div>
@@ -142,60 +223,79 @@
             class="absolute bottom-1/4 -right-20 w-80 h-80 bg-blue-600/10 rounded-full blur-[100px] animate-pulse-slow">
         </div>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                <div class="text-center lg:text-left space-y-8 relative z-10">
+                <div data-hero-stagger class="text-center lg:text-left space-y-7 relative z-10">
                     <div
-                        class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-xs font-semibold uppercase tracking-wider mb-2">
-                        <span class="relative flex h-2 w-2">
-                            <span
-                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
-                        </span>
-                        <span>Inscripciones Abiertas 2026</span>
+                        class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.06] border border-white/10 text-slate-300 text-[11px] font-semibold uppercase tracking-wider">
+                        <span class="h-1.5 w-1.5 rounded-full bg-accent-400"></span>
+                        <span>Para dueños, gerentes y equipos técnicos</span>
                     </div>
-                    <h1 class="text-5xl md:text-7xl font-display font-extrabold text-white leading-tight">
-                        Domina la <span class="text-brand-500">IA</span> que Escala en Producción Real
+                    <h1 class="text-5xl md:text-6xl font-display font-extrabold text-white leading-[1.05]">
+                        Empieza por lo aburrido.
                     </h1>
-                    <p class="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                        Domina el "Vibe Coding" y la orquestación de agentes autónomos. Formamos a los líderes y desarrolladores que están escalando la IA en corporativos globales y startups de alto impacto. No enseñamos teoría, enseñamos lo que implementamos.
+                    <p class="text-[15px] font-medium text-slate-500 uppercase tracking-[0.2em]">No es magia. Es magis.</p>
+                    <p class="text-lg md:text-xl text-slate-400 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                        El problema nunca fue la herramienta. Es que nadie te dijo por dónde empezar. Te mostramos qué automatizar, en qué orden y cuánto vale en horas y en soles — y qué no vale la pena tocar todavía.
                     </p>
-                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                    <p class="text-base text-slate-500 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                        La IA no arregla lo que está roto. Lo hace más rápido. Por eso la primera semana no automatizamos: documentamos.
+                    </p>
+                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-1">
                         <a href="#register"
-                            class="w-full sm:w-auto bg-brand-500 hover:bg-brand-600 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl shadow-brand-500/30 transition-all hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2">
-                            Empieza Gratis <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                            class="w-full sm:w-auto bg-brand-600 hover:bg-brand-500 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all hover:-translate-y-0.5 active:scale-95 flex items-center justify-center gap-2">
+                            Reservar mi lugar <i data-lucide="arrow-right" class="w-5 h-5"></i>
                         </a>
                     </div>
-                    <div class="flex items-center justify-center lg:justify-start space-x-4 pt-4">
-                        <div class="flex -space-x-3">
-                            <img src="https://i.pravatar.cc/100?img=1"
-                                class="w-10 h-10 rounded-full border-2 border-dark-900" alt="Student">
-                            <img src="https://i.pravatar.cc/100?img=2"
-                                class="w-10 h-10 rounded-full border-2 border-dark-900" alt="Student">
-                            <img src="https://i.pravatar.cc/100?img=3"
-                                class="w-10 h-10 rounded-full border-2 border-dark-900" alt="Student">
-                        </div>
-                        <p class="text-sm text-slate-500 font-medium">+5,000 profesionales ya se están capacitando</p>
-                    </div>
+                    <p class="text-sm text-slate-500 max-w-xl mx-auto lg:mx-0">Operamos y rompimos cosas en startups y corporativos antes de venir a hablar de esto.</p>
                 </div>
-                <div class="relative lg:block">
-                    <div class="relative z-10 glass p-4 rounded-3xl animate-float shadow-2xl overflow-hidden">
-                        <!-- Hero Image from artifact directory will be linked here -->
-                        <img src="assets/img/hero_ai_learning.png" alt="AI Mastery Visualization"
-                            class="rounded-2xl shadow-lg w-full h-auto object-cover aspect-video lg:aspect-auto">
-                        <div class="absolute top-8 left-8 p-4 glass rounded-2xl border border-white/10 hidden md:block">
-                            <div class="flex items-center gap-3">
-                                <div class="bg-green-500/20 p-2 rounded-lg">
-                                    <i data-lucide="trending-up" class="text-green-500 w-5 h-5"></i>
-                                </div>
-                                <div>
-                                    <p class="text-[10px] text-slate-400 uppercase font-bold">Salario Promedio IA</p>
-                                    <p class="text-white font-bold leading-none">$120k / año</p>
+                <div class="relative lg:block" data-reveal data-reveal-from="right">
+                    <a href="#register" data-magnetic aria-label="Reservar lugar en el webinar Riesgos de seguridad de la IA"
+                        class="relative z-10 block bg-dark-800/90 backdrop-blur-xl rounded-3xl p-8 md:p-10 overflow-hidden group ring-1 ring-white/10 hover:ring-brand-400/40 transition-all shadow-[0_24px_70px_-20px_rgba(59,130,246,0.35)]">
+                        <div class="absolute -top-24 -right-24 w-72 h-72 rounded-full blur-[90px] brand-sweep opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                        <div class="relative z-10 space-y-6">
+                            <div class="flex items-center justify-between">
+                                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-white text-[11px] font-bold uppercase tracking-wider">
+                                    <span class="relative flex h-2 w-2">
+                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-400 opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-2 w-2 bg-accent-400"></span>
+                                    </span>
+                                    Webinar gratuito
+                                </span>
+                                <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Próximo evento</span>
+                            </div>
+
+                            <div>
+                                <h2 class="text-2xl md:text-3xl font-display font-extrabold text-white leading-tight">
+                                    Riesgos de seguridad de la IA
+                                </h2>
+                                <div class="flex flex-wrap gap-2 mt-4">
+                                    <span class="text-[11px] font-medium text-slate-300 bg-white/[0.06] border border-white/10 px-2.5 py-1 rounded-lg">Qué se lleva tu gente</span>
+                                    <span class="text-[11px] font-medium text-slate-300 bg-white/[0.06] border border-white/10 px-2.5 py-1 rounded-lg">Qué decide la IA sola</span>
+                                    <span class="text-[11px] font-medium text-slate-300 bg-white/[0.06] border border-white/10 px-2.5 py-1 rounded-lg">De qué dependes sin control</span>
                                 </div>
                             </div>
+
+                            <div class="grid grid-cols-3 gap-3 py-4 border-y border-white/10">
+                                <div>
+                                    <p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">Fecha</p>
+                                    <p class="text-white font-bold text-sm">12 set</p>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">Hora</p>
+                                    <p class="text-white font-bold text-sm">7:00 p.m.</p>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">Dónde</p>
+                                    <p class="text-white font-bold text-sm">Google Meet</p>
+                                </div>
+                            </div>
+
+                            <span class="inline-flex items-center justify-center w-full gap-2 brand-sweep text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-brand-500/30 group-hover:gap-3 transition-all">
+                                Reservar mi lugar <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                            </span>
                         </div>
-                    </div>
-                    <div class="absolute -bottom-10 -left-10 w-48 h-48 bg-brand-600/20 blur-3xl -z-10"></div>
+                    </a>
                 </div>
             </div>
         </div>
@@ -204,109 +304,84 @@
     <!-- Benefits Section -->
     <section id="benefits" class="py-24 bg-dark-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center space-y-4 mb-20">
-                <h2 class="text-brand-500 font-bold uppercase tracking-widest text-sm">¿Por qué nosotros?</h2>
-                <h3 class="text-4xl md:text-5xl font-display font-bold text-white">Diseñado para el Mundo Real</h3>
-                <p class="text-slate-400 max-w-2xl mx-auto">Nuestra metodología se enfoca en proyectos prácticos que
-                    puedes añadir a tu portafolio desde el primer día.</p>
+            <div class="text-center space-y-4 mb-20" data-reveal>
+                <h2 class="text-brand-500 font-bold uppercase tracking-widest text-sm">Cómo trabajamos</h2>
+                <h3 class="text-4xl md:text-5xl font-display font-bold text-white">Horas y soles. Nada más.</h3>
+                <p class="text-slate-400 max-w-2xl mx-auto">Si no lo puedes medir en horas o en soles, no lo hagas
+                    todavía. Trabajamos con tus procesos reales, no con casos de ejemplo.</p>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8" data-reveal-group>
                 <!-- Card 1 -->
-                <div class="glass p-8 rounded-3xl border border-white/5 hover:border-brand-500/30 transition-all group">
+                <div class="glass p-8 rounded-3xl border border-white/5 hover:border-brand-500/30 transition-all group" data-tilt>
                     <div
                         class="w-14 h-14 bg-brand-600/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                        <i data-lucide="cpu" class="text-brand-500 w-8 h-8"></i>
+                        <i data-lucide="file-text" class="text-brand-500 w-8 h-8"></i>
                     </div>
-                    <h4 class="text-xl font-display font-bold text-white mb-4">Currícula de Vanguardia</h4>
-                    <p class="text-slate-400 leading-relaxed">Contenido actualizado semanalmente con las últimas
-                        tendencias: LLMs, Generative AI y Agents.</p>
+                    <h4 class="text-xl font-display font-bold text-white mb-4">Primero documentamos</h4>
+                    <p class="text-slate-400 leading-relaxed">Tienes razón: no tiene sentido automatizar un desorden.
+                        La primera semana mapeamos tus procesos y cuánto te cuestan hoy en horas.</p>
                 </div>
                 <!-- Card 2 -->
-                <div class="glass p-8 rounded-3xl border border-white/5 hover:border-blue-500/30 transition-all group">
+                <div class="glass p-8 rounded-3xl border border-white/5 hover:border-accent-400/30 transition-all group" data-tilt>
                     <div
-                        class="w-14 h-14 bg-blue-600/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                        <i data-lucide="users" class="text-blue-500 w-8 h-8"></i>
+                        class="w-14 h-14 bg-accent-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="list-ordered" class="text-accent-400 w-8 h-8"></i>
                     </div>
-                    <h4 class="text-xl font-display font-bold text-white mb-4">Experiencia en Producción</h4>
-                    <p class="text-slate-400 leading-relaxed">De la arquitectura a la producción: Hemos construido soluciones de IA que hoy operan en grandes corporativos en Latam (Credicorp, Intercorp y más) y el mercado estadounidense.</p>
+                    <h4 class="text-xl font-display font-bold text-white mb-4">Te decimos el orden</h4>
+                    <p class="text-slate-400 leading-relaxed">Cuál proceso tocamos primero y cuáles dejas quietos por
+                        ahora. La parte que nadie te dice porque no se factura.</p>
                 </div>
                 <!-- Card 3 -->
-                <div class="glass p-8 rounded-3xl border border-white/5 hover:border-green-500/30 transition-all group">
+                <div class="glass p-8 rounded-3xl border border-white/5 hover:border-violet-500/30 transition-all group" data-tilt>
                     <div
-                        class="w-14 h-14 bg-green-600/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                        <i data-lucide="award" class="text-green-500 w-8 h-8"></i>
+                        class="w-14 h-14 bg-violet-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="alert-triangle" class="text-violet-400 w-8 h-8"></i>
                     </div>
-                    <h4 class="text-xl font-display font-bold text-white mb-4">Certificación Global</h4>
-                    <p class="text-slate-400 leading-relaxed">Al finalizar cada módulo, obtén un certificado verificado
-                        en la blockchain para LinkedIn.</p>
+                    <h4 class="text-xl font-display font-bold text-white mb-4">Sabemos cómo se rompe</h4>
+                    <p class="text-slate-400 leading-relaxed">El 40% de los proyectos de agentes se va a cancelar antes
+                        del 2027. Hemos roto estos proyectos antes; venimos a decirte qué camino no sirve.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Talleres Section -->
-    <section id="courses" class="py-24 bg-gradient-to-br from-[#5340f1] via-[#d042f8] to-[#e44a7b] relative">
+    <section id="courses" class="py-24 bg-gradient-to-br from-accent-500 via-brand-600 to-violet-600 relative">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-            <h2 class="text-white text-5xl font-display font-extrabold mb-4 drop-shadow-sm">Talleres Intensivos de IA
-            </h2>
-            <p class="text-white/90 text-lg md:text-xl max-w-2xl mx-auto mb-16 font-medium">Workshops prácticos y
-                rápidos para dominar las habilidades más demandadas en Inteligencia Artificial.</p>
+            <div data-reveal>
+                <h2 class="text-white text-5xl font-display font-extrabold mb-4 drop-shadow-sm">Talleres en vivo
+                </h2>
+                <p class="text-white/90 text-lg md:text-xl max-w-2xl mx-auto mb-16 font-medium">Sales con tareas de tu
+                    trabajo real automatizadas. Enseñamos con tus procesos, no con casos de ejemplo. El que tiene que
+                    aprender esto eres tú, no solo tu equipo.</p>
+            </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Workshop 1: Deep Learning Engineering -->
-                <div
-                    class="bg-white rounded-[24px] shadow-2xl hover:-translate-y-2 transition-all duration-300 text-left flex flex-col overflow-hidden group">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto" data-reveal-group>
+                <!-- Workshop: Construye con IA: De Prompts a Agentes -->
+                <div data-tilt
+                    class="bg-white rounded-[24px] shadow-2xl transition-all duration-300 text-left flex flex-col overflow-hidden group border-t-4 border-brand-500">
                     <div class="relative h-52 overflow-hidden">
-                        <img src="assets/img/teacher_ml_1.png" alt="Instructor Deep Learning"
+                        <img src="assets/img/teacher_agents_1.png" alt="Instructor Construye con IA"
                             class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                        
+
                         <div class="absolute bottom-5 left-5 right-5 pointer-events-none">
-                            <h4 class="text-white text-lg font-display font-bold leading-tight">Deep
-                                Learning<br>Engineering</h4>
+                            <h4 class="text-white text-lg font-display font-bold leading-tight">Construye con IA:<br>De
+                                Prompts a Agentes</h4>
                         </div>
                     </div>
                     <div class="p-6 flex-grow">
                         <span
-                            class="inline-block bg-sky-100 text-sky-600 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider mb-3">ML
-                            Engineer</span>
-                        <h3 class="text-slate-800 text-lg font-bold leading-tight mb-2">Deep Learning Engineering</h3>
-                        <p class="text-slate-500 text-sm">Escalabilidad de modelos, pipelines de MLOps y producción avanzada de nivel empresarial.</p>
+                            class="inline-block bg-orange-50 text-orange-600 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider mb-3">Programa
+                            · 4 Sesiones</span>
+                        <h3 class="text-slate-800 text-lg font-bold leading-tight mb-2">Construye con IA: De Prompts a
+                            Agentes</h3>
+                        <p class="text-slate-500 text-sm">De prompts a agentes que ordenan tareas repetitivas de tu
+                            operación. Conectas tus herramientas, tus datos y automatizas lo aburrido. Sin jerga sin
+                            traducir.</p>
                     </div>
                     <div class="px-6 pb-6 flex items-center justify-between">
-                        <button onclick="openSyllabus('Deep Learning Engineering')"
-                            class="text-brand-600 font-bold hover:text-brand-800 transition-colors flex items-center gap-1 group/link text-sm">Ver
-                            más <i data-lucide="chevron-right"
-                                class="w-4 h-4 group-hover/link:translate-x-1 transition-transform"></i></button>
-                        <span class="flex items-center gap-1.5 bg-indigo-50 text-indigo-600 text-[11px] font-bold px-3 py-1.5 rounded-full border border-indigo-100/50 uppercase tracking-wider">
-                            <i data-lucide="clock" class="w-3.5 h-3.5"></i>
-                            12 hrs
-                        </span>
-                    </div>
-                </div>
-
-                <!-- Workshop 2: LLM Fine-tuning & NLP -->
-                <div
-                    class="bg-white rounded-[24px] shadow-2xl hover:-translate-y-2 transition-all duration-300 text-left flex flex-col overflow-hidden group">
-                    <div class="relative h-52 overflow-hidden">
-                        <img src="assets/img/teacher_ml_2.png" alt="Instructor NLP"
-                            class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                        
-                        <div class="absolute bottom-5 left-5 right-5 pointer-events-none">
-                            <h4 class="text-white text-lg font-display font-bold leading-tight">NLP Masterclass<br>& LLM
-                                Fine-tuning</h4>
-                        </div>
-                    </div>
-                    <div class="p-6 flex-grow">
-                        <span
-                            class="inline-block bg-sky-100 text-sky-600 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider mb-3">ML
-                            Engineer</span>
-                        <h3 class="text-slate-800 text-lg font-bold leading-tight mb-2">LLM Fine-tuning & NLP</h3>
-                        <p class="text-slate-500 text-sm">Entrenamiento de modelos fundacionales con LoRA, QLoRA y arquitecturas RAG escalables.</p>
-                    </div>
-                    <div class="px-6 pb-6 flex items-center justify-between">
-                        <button onclick="openSyllabus('LLM Fine-tuning & NLP')"
+                        <button onclick="openSyllabus('Construye con IA: De Prompts a Agentes')"
                             class="text-brand-600 font-bold hover:text-brand-800 transition-colors flex items-center gap-1 group/link text-sm">Ver
                             más <i data-lucide="chevron-right"
                                 class="w-4 h-4 group-hover/link:translate-x-1 transition-transform"></i></button>
@@ -317,73 +392,9 @@
                     </div>
                 </div>
 
-                <!-- Workshop 3: AI Systems Architecture -->
-                <div
-                    class="bg-white rounded-[24px) shadow-2xl hover:-translate-y-2 transition-all duration-300 text-left flex flex-col overflow-hidden group">
-                    <div class="relative h-52 overflow-hidden">
-                        <img src="assets/img/teacher_ai_1.png" alt="Instructor AI Systems"
-                            class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                        
-                        <div class="absolute bottom-5 left-5 right-5 pointer-events-none">
-                            <h4 class="text-white text-lg font-display font-bold leading-tight">AI
-                                Systems<br>Architecture</h4>
-                        </div>
-                    </div>
-                    <div class="p-6 flex-grow">
-                        <span
-                            class="inline-block bg-orange-50 text-orange-600 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider mb-3">Architect</span>
-                        <h3 class="text-slate-800 text-lg font-bold leading-tight mb-2">AI Systems Architecture</h3>
-                        <p class="text-slate-500 text-sm">Diseño de infraestructuras de IA resilientes para grandes corporativos y startups.</p>
-                    </div>
-                    <div class="px-6 pb-6 flex items-center justify-between">
-                        <button onclick="openSyllabus('AI Systems Architecture')"
-                            class="text-brand-600 font-bold hover:text-brand-800 transition-colors flex items-center gap-1 group/link text-sm">Ver
-                            más <i data-lucide="chevron-right"
-                                class="w-4 h-4 group-hover/link:translate-x-1 transition-transform"></i></button>
-                        <span class="flex items-center gap-1.5 bg-indigo-50 text-indigo-600 text-[11px] font-bold px-3 py-1.5 rounded-full border border-indigo-100/50 uppercase tracking-wider">
-                            <i data-lucide="clock" class="w-3.5 h-3.5"></i>
-                            16 hrs
-                        </span>
-                    </div>
-                </div>
-
-                <!-- Workshop 4: Agentes IA en Producción -->
-                <div
-                    class="bg-white rounded-[24px] shadow-2xl hover:-translate-y-2 transition-all duration-300 text-left flex flex-col overflow-hidden group">
-                    <div class="relative h-52 overflow-hidden">
-                        <img src="assets/img/teacher_agents_1.png" alt="Instructor Agentes IA"
-                            class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                        
-                        <div class="absolute bottom-5 left-5 right-5 pointer-events-none">
-                            <h4 class="text-white text-lg font-display font-bold leading-tight">Agentes IA<br>en
-                                Producción</h4>
-                        </div>
-                    </div>
-                    <div class="p-6 flex-grow">
-                        <span
-                            class="inline-block bg-orange-50 text-orange-600 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider mb-3">AI
-                            Engineer</span>
-                        <h3 class="text-slate-800 text-lg font-bold leading-tight mb-2">Diseño y Despliegue de Agentes
-                            IA</h3>
-                        <p class="text-slate-500 text-sm">Orquestación de agentes autónomos con LangGraph y CrewAI para flujos reales.</p>
-                    </div>
-                    <div class="px-6 pb-6 flex items-center justify-between">
-                        <button onclick="openSyllabus('Diseño y Despliegue de Agentes IA')"
-                            class="text-brand-600 font-bold hover:text-brand-800 transition-colors flex items-center gap-1 group/link text-sm">Ver
-                            más <i data-lucide="chevron-right"
-                                class="w-4 h-4 group-hover/link:translate-x-1 transition-transform"></i></button>
-                        <span class="flex items-center gap-1.5 bg-indigo-50 text-indigo-600 text-[11px] font-bold px-3 py-1.5 rounded-full border border-indigo-100/50 uppercase tracking-wider">
-                            <i data-lucide="clock" class="w-3.5 h-3.5"></i>
-                            12 hrs
-                        </span>
-                    </div>
-                </div>
-
-                <!-- Workshop 5: Claude Code para Developers -->
-                <div
-                    class="bg-white rounded-[24px] shadow-2xl hover:-translate-y-2 transition-all duration-300 text-left flex flex-col overflow-hidden group border-t-4 border-brand-500">
+                <!-- Workshop: Claude Code para Developers -->
+                <div data-tilt
+                    class="bg-white rounded-[24px] shadow-2xl transition-all duration-300 text-left flex flex-col overflow-hidden group border-t-4 border-brand-500">
                     <div class="relative h-52 overflow-hidden">
                         <img src="assets/img/teacher_claude_1.png" alt="Instructor Claude Code"
                             class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500">
@@ -398,7 +409,7 @@
                         <span
                             class="inline-block bg-purple-50 text-purple-600 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider mb-3">Developer</span>
                         <h3 class="text-slate-800 text-lg font-bold leading-tight mb-2">Claude Code para Developers</h3>
-                        <p class="text-slate-500 text-sm">Aumenta tu productividad x10 con Claude Code, APIs personalizadas y tooling avanzado.</p>
+                        <p class="text-slate-500 text-sm">Para tu equipo técnico: construir software real con Claude Code, no escribir prompts. Sales con una tarea de tu backlog resuelta.</p>
                     </div>
                     <div class="px-6 pb-6 flex items-center justify-between">
                         <button onclick="openSyllabus('Claude Code para Developers')"
@@ -411,70 +422,75 @@
                         </span>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
 
-                <!-- Workshop 6: Modelos Generativos y Fundacionales -->
-                <div
-                    class="bg-white rounded-[24px] shadow-2xl hover:-translate-y-2 transition-all duration-300 text-left flex flex-col overflow-hidden group">
-                    <div class="relative h-52 overflow-hidden">
-                        <img src="assets/img/teacher_gen_1.png" alt="Instructor Modelos Generativos"
-                            class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                        
-                        <div class="absolute bottom-5 left-5 right-5 pointer-events-none">
-                            <h4 class="text-white text-lg font-display font-bold leading-tight">Modelos Generativos<br>&
-                                Fundacionales</h4>
+    <!-- Webinar Gratuito Section -->
+    <section id="webinar" class="py-20 bg-dark-900 border-t border-white/5">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8" data-reveal>
+            <a href="#register" data-magnetic
+                class="block glass rounded-[32px] border border-white/10 p-8 md:p-12 hover:border-brand-500/40 transition-all group relative overflow-hidden">
+                <div class="absolute -top-20 -right-20 w-72 h-72 brand-sweep opacity-10 rounded-full blur-[100px] group-hover:opacity-20 transition-opacity"></div>
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center gap-8">
+                    <div class="flex-1 space-y-4">
+                        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-500/10 border border-accent-400/20 text-accent-300 text-xs font-bold uppercase tracking-wider">
+                            <i data-lucide="video" class="w-3.5 h-3.5"></i> Webinar Gratuito
+                        </span>
+                        <h2 class="text-3xl md:text-4xl font-display font-extrabold text-white leading-tight">
+                            Riesgos de seguridad de la IA
+                        </h2>
+                        <p class="text-slate-400 leading-relaxed">
+                            Tu gente ya está usando IA. Solo que no te lo dice. Qué pasa con tus datos, con las decisiones automatizadas y con depender de una herramienta que no controlas — dentro de una empresa de 30 personas, este trimestre.
+                        </p>
+                        <div class="flex flex-wrap gap-x-8 gap-y-4 pt-2">
+                            <div>
+                                <p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Fecha</p>
+                                <p class="text-white font-bold flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4 text-accent-400"></i> 12 de setiembre</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Hora</p>
+                                <p class="text-white font-bold flex items-center gap-2"><i data-lucide="clock" class="w-4 h-4 text-accent-400"></i> 7:00 p.m.</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Plataforma</p>
+                                <p class="text-white font-bold flex items-center gap-2"><i data-lucide="monitor" class="w-4 h-4 text-accent-400"></i> Google Meet</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="p-6 flex-grow">
-                        <span
-                            class="inline-block bg-purple-50 text-purple-600 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider mb-3">Senior</span>
-                        <h3 class="text-slate-800 text-lg font-bold leading-tight mb-2">Modelos Generativos y
-                            Fundacionales</h3>
-                        <p class="text-slate-500 text-sm">Deep dive en la arquitectura Transformer y el despliegue de modelos multimodales nativos.</p>
-                    </div>
-                    <div class="px-6 pb-6 flex items-center justify-between">
-                        <button onclick="openSyllabus('Modelos Generativos y Fundacionales')"
-                            class="text-brand-600 font-bold hover:text-brand-800 transition-colors flex items-center gap-1 group/link text-sm">Ver
-                            más <i data-lucide="chevron-right"
-                                class="w-4 h-4 group-hover/link:translate-x-1 transition-transform"></i></button>
-                        <span class="flex items-center gap-1.5 bg-indigo-50 text-indigo-600 text-[11px] font-bold px-3 py-1.5 rounded-full border border-indigo-100/50 uppercase tracking-wider">
-                            <i data-lucide="clock" class="w-3.5 h-3.5"></i>
-                            12 hrs
+                    <div class="shrink-0">
+                        <span class="inline-flex items-center justify-center gap-2 brand-sweep text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl shadow-brand-500/30 transition-all group-hover:-translate-y-1 group-hover:gap-3">
+                            Reservar mi lugar <i data-lucide="arrow-right" class="w-5 h-5"></i>
                         </span>
                     </div>
                 </div>
-            </div>
-
-            <div class="mt-16 flex items-center justify-center gap-4">
-                <button
-                    class="bg-white text-brand-600 px-8 py-4 rounded-xl font-bold shadow-xl hover:bg-slate-50 transition-all flex items-center gap-2">Explorar
-                    Todos los Talleres</button>
-            </div>
+            </a>
         </div>
     </section>
 
     <!-- FAQ Section -->
     <section id="faq" class="py-24 bg-dark-900 border-t border-white/5">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-display font-bold text-white mb-4">Preguntas Frecuentes</h2>
-                <p class="text-slate-400">Todo lo que necesitas saber antes de empezar tu camino en la IA.</p>
+            <div class="text-center mb-16" data-reveal>
+                <h2 class="text-3xl md:text-4xl font-display font-bold text-white mb-4">Antes de que decidas</h2>
+                <p class="text-slate-400">Lo que sí y lo que no vas a encontrar acá.</p>
             </div>
 
-            <div class="space-y-4">
+            <div class="space-y-4" data-reveal-group>
                 <!-- FAQ 1 -->
                 <div class="glass rounded-2xl overflow-hidden border border-white/5">
                     <button
                         class="w-full p-6 text-left flex items-center justify-between hover:bg-white/5 transition-colors group"
                         onclick="toggleFAQ(this)">
-                        <span class="font-bold text-white pr-8">¿Necesito experiencia previa en programación?</span>
+                        <span class="font-bold text-white pr-8">¿Para quién es esto?</span>
                         <i data-lucide="chevron-down"
                             class="text-slate-500 group-[.active]:rotate-180 transition-transform"></i>
                     </button>
                     <div class="faq-content hidden p-6 pt-0 text-slate-400 border-t border-white/5">
-                        <p>Para los cursos de ML Engineer, recomendamos conocimientos básicos de Python y álgebra
-                            lineal. Sin embargo, para nuestra ruta de "AI Mastery Essentials", empezamos desde los
-                            fundamentos absolutos.</p>
+                        <p>Para dueños y gerentes que necesitan poner orden, y para desarrolladores y profesionales
+                            técnicos que ya usan IA todos los días y sienten que están en el 5% de lo que podrían hacer.
+                            No te vamos a enseñar a escribir prompts: ya sabes, y hay cuarenta videos gratis. Damos por
+                            sentado que ya intentaste cosas y que eres quien tiene que entender por dónde empezar.</p>
                     </div>
                 </div>
 
@@ -483,13 +499,13 @@
                     <button
                         class="w-full p-6 text-left flex items-center justify-between hover:bg-white/5 transition-colors group"
                         onclick="toggleFAQ(this)">
-                        <span class="font-bold text-white pr-8">¿Recibo un certificado al finalizar?</span>
+                        <span class="font-bold text-white pr-8">¿Van a mostrarme las herramientas nuevas del mes?</span>
                         <i data-lucide="chevron-down"
                             class="text-slate-500 group-[.active]:rotate-180 transition-transform"></i>
                     </button>
                     <div class="faq-content hidden p-6 pt-0 text-slate-400 border-t border-white/5">
-                        <p>Sí, cada curso incluye una certificación verificada en la blockchain que puedes compartir en
-                            LinkedIn. Es reconocida mundialmente por su rigor técnico.</p>
+                        <p>No. En tres meses estarían desactualizadas y tú lo sabes — es la razón por la que llevas
+                            meses sin arrancar. Trabajamos con criterios y procesos, que duran.</p>
                     </div>
                 </div>
 
@@ -498,13 +514,13 @@
                     <button
                         class="w-full p-6 text-left flex items-center justify-between hover:bg-white/5 transition-colors group"
                         onclick="toggleFAQ(this)">
-                        <span class="font-bold text-white pr-8">¿Cuánto tiempo tengo para completar el curso?</span>
+                        <span class="font-bold text-white pr-8">¿La IA va a transformar mi empresa?</span>
                         <i data-lucide="chevron-down"
                             class="text-slate-500 group-[.active]:rotate-180 transition-transform"></i>
                     </button>
                     <div class="faq-content hidden p-6 pt-0 text-slate-400 border-t border-white/5">
-                        <p>Una vez inscrito, tienes acceso de por vida al material. Aunque cada ruta está diseñada para
-                            completarse en 10-14 semanas con una dedicación de 5-8 horas semanales.</p>
+                        <p>No la va a transformar. Va a hacer más rápido lo que ya haces, y si eso está desordenado, lo
+                            va a desordenar más rápido. Por eso empezamos documentando.</p>
                     </div>
                 </div>
 
@@ -513,13 +529,14 @@
                     <button
                         class="w-full p-6 text-left flex items-center justify-between hover:bg-white/5 transition-colors group"
                         onclick="toggleFAQ(this)">
-                        <span class="font-bold text-white pr-8">¿Hay tutorías personalizadas?</span>
+                        <span class="font-bold text-white pr-8">¿Con qué me quedo al terminar el taller?</span>
                         <i data-lucide="chevron-down"
                             class="text-slate-500 group-[.active]:rotate-180 transition-transform"></i>
                     </button>
                     <div class="faq-content hidden p-6 pt-0 text-slate-400 border-t border-white/5">
-                        <p>Sí, todos nuestros programas incluyen acceso a sesiones semanales en vivo de Q&A con mentores
-                            expertos y un canal de Discord privado 24/7.</p>
+                        <p>Con tres procesos de tu empresa mapeados, las horas que te cuestan hoy, y cuál de los tres
+                            tocamos primero. De los otros dos, probablemente te digamos que los dejes quietos por
+                            ahora.</p>
                     </div>
                 </div>
             </div>
@@ -543,7 +560,7 @@
 
                     <div class="pt-8 border-t border-white/10">
                         <a href="#register" onclick="closeSyllabus()" class="inline-flex items-center justify-center w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-4 rounded-2xl transition-all shadow-xl shadow-brand-500/20 active:scale-95 gap-2">
-                            Reservar mi cupo <i data-lucide="zap" class="w-5 h-5"></i>
+                            Reservar mi lugar <i data-lucide="arrow-right" class="w-5 h-5"></i>
                         </a>
                     </div>
                 </div>
@@ -555,12 +572,11 @@
     <section id="register" class="py-24 relative overflow-hidden bg-dark-800">
         <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10">
         </div>
-        <div class="max-w-4xl mx-auto px-4 relative z-10">
+        <div class="max-w-4xl mx-auto px-4 relative z-10" data-reveal>
             <div class="glass p-8 md:p-12 rounded-[40px] border border-white/10 shadow-3xl">
                 <div class="text-center mb-12">
-                    <h2 class="text-3xl md:text-4xl font-display font-bold text-white mb-4">Regístrate a la Masterclass
-                        Gratis</h2>
-                    <p class="text-slate-400">Cupos limitados. Asegura tu lugar y recibe de regalo nuestro E-book.</p>
+                    <h2 class="text-3xl md:text-4xl font-display font-bold text-white mb-4">Reserva tu lugar</h2>
+                    <p class="text-slate-400">Cupos limitados por cohorte. Te escribimos por WhatsApp para coordinar los detalles.</p>
                 </div>
 
                 <form id="registrationForm" novalidate class="space-y-6">
@@ -587,17 +603,14 @@
                             <span class="error-message">Ingresa tu número de WhatsApp.</span>
                         </div>
                         <div class="space-y-2">
-                            <label for="interest" class="text-sm font-medium text-slate-300 ml-1">Área de
-                                Interés</label>
+                            <label for="interest" class="text-sm font-medium text-slate-300 ml-1">¿Qué te
+                                interesa?</label>
                             <select id="interest" name="interest" required
                                 class="w-full bg-dark-900 border border-white/10 rounded-2xl p-4 text-white focus:border-brand-500 transition-all appearance-none">
                                 <option value="">Selecciona una opción</option>
-                                <option value="deep_learning">Deep Learning Engineering</option>
-                                <option value="llm_nlp">LLM Fine-tuning & NLP</option>
-                                <option value="ai_systems">AI Systems Architecture</option>
-                                <option value="ai_agents">Agentes IA en Producción</option>
+                                <option value="prompts_agentes">Construye con IA: De Prompts a Agentes</option>
                                 <option value="claude_code">Claude Code para Developers</option>
-                                <option value="gen_ai">Modelos Generativos y Fundacionales</option>
+                                <option value="webinar_seguridad">Webinar: Riesgos de Seguridad de la IA (12 set)</option>
                             </select>
                             <span class="error-message">Selecciona un área.</span>
                         </div>
@@ -607,8 +620,8 @@
                             <div class="flex items-start space-x-3">
                                 <input type="checkbox" id="data_auth" name="data_auth" required
                                     class="mt-1 accent-brand-500 w-4 h-4">
-                                <label for="data_auth" class="text-sm text-slate-400">Autorizo el uso de mi información
-                                    para fines académicos y promocionales de Magis AI Academy.</label>
+                                <label for="data_auth" class="text-sm text-slate-400">Autorizo a MAGIS AI a usar mis
+                                    datos para contactarme sobre este programa.</label>
                             </div>
                             <span id="authError" class="error-message">Debes autorizar el uso de datos para
                                 continuar.</span>
@@ -617,12 +630,12 @@
 
                     <button type="submit"
                         class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-5 rounded-2xl text-lg shadow-xl shadow-brand-600/40 transition-all hover:scale-[1.02] active:scale-[0.98] mt-4">
-                        Reservar Mi Lugar Ahora
+                        Reservar mi lugar
                     </button>
 
                     <p class="text-center text-xs text-slate-500 mt-6">
                         <i data-lucide="shield-check" class="inline w-3 h-3 mr-1"></i> No compartimos tus datos con
-                        terceros. Puedes darte de baja en cualquier momento.
+                        terceros. Puedes pedir que los borremos cuando quieras.
                     </p>
                 </form>
 
@@ -632,8 +645,8 @@
                         class="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6 transform scale-110 animate-bounce">
                         <i data-lucide="check-circle" class="text-green-500 w-10 h-10"></i>
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-2">¡Inscripción Exitosa!</h3>
-                    <p class="text-slate-400">Revisa tu correo para confirmar tu asistencia y descargar tu E-book.</p>
+                    <h3 class="text-2xl font-bold text-white mb-2">Lugar reservado.</h3>
+                    <p class="text-slate-400">Te escribimos por WhatsApp en las próximas 48 horas para coordinar los detalles.</p>
                 </div>
                 
                 <!-- Error Message (Hidden by default) -->
@@ -648,20 +661,23 @@
     <!-- Footer -->
     <footer class="py-12 bg-dark-900 border-t border-white/5">
         <div class="max-w-7xl mx-auto px-4 text-center">
-            <div class="flex items-center justify-center space-x-2 mb-8">
-                <div class="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
-                    <i data-lucide="zap" class="text-white w-5 h-5"></i>
-                </div>
-                <span class="text-lg font-display font-bold text-white uppercase tracking-tighter">Magis AI
-                    Academy</span>
+            <div class="flex items-center justify-center space-x-3 mb-6">
+                <svg class="w-8 h-8" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M6 26 L15 6 L24 20 L33 6 L42 26" stroke="url(#magisGrad)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="6" cy="26" r="4.5" fill="url(#magisGrad)"/>
+                    <circle cx="15" cy="6" r="4.5" fill="url(#magisGrad)"/>
+                    <circle cx="33" cy="6" r="4.5" fill="url(#magisGrad)"/>
+                    <circle cx="42" cy="26" r="4.5" fill="url(#magisGrad)"/>
+                    <circle cx="24" cy="24" r="3.2" fill="url(#magisGrad)"/>
+                </svg>
+                <span class="text-lg font-display font-bold text-white uppercase tracking-tighter">MAGIS AI</span>
             </div>
+            <p class="text-slate-400 text-sm mb-6 font-medium">No es magia. Es magis.</p>
             <div class="flex justify-center space-x-6 mb-8 text-slate-400">
-                <a href="#" class="hover:text-white transition-colors"><i data-lucide="twitter"></i></a>
-                <a href="#" class="hover:text-white transition-colors"><i data-lucide="instagram"></i></a>
                 <a href="#" class="hover:text-white transition-colors"><i data-lucide="linkedin"></i></a>
-                <a href="#" class="hover:text-white transition-colors"><i data-lucide="github"></i></a>
+                <a href="#" class="hover:text-white transition-colors"><i data-lucide="instagram"></i></a>
             </div>
-            <p class="text-slate-500 text-sm">© 2026 AI Mastery Inc. Todos los derechos reservados.</p>
+            <p class="text-slate-500 text-sm">© 2026 MAGIS AI · magis-ai.io</p>
         </div>
     </footer>
 
@@ -766,77 +782,31 @@
 
         // Syllabus Modal Data
         const syllabusData = {
-            'Deep Learning Engineering': {
-                sumilla: 'Taller práctico donde los participantes entrenarán, optimizarán y desplegarán un modelo de deep learning listo para producción. Se trabajará sobre un caso real, cubriendo desde el entrenamiento hasta su exposición como API.',
-                resultado: 'Modelo entrenado + API desplegada',
+            'Construye con IA: De Prompts a Agentes': {
+                sumilla: 'Programa en vivo de 4 sesiones (16 horas, todo práctica). Vas de escribir buenos prompts a montar un agente: un programa que ejecuta una tarea repetitiva de tu operación por su cuenta, conectado a tus herramientas y tus datos. Cada sesión se trabaja sobre un proceso tuyo, no sobre un caso de ejemplo.',
+                resultado: 'Un agente que ejecuta una tarea real de tu operación',
                 handsOn: [
-                    'Entrenamiento de modelo (PyTorch/TensorFlow)',
-                    'Ajuste de hiperparámetros',
-                    'Exportación del modelo',
-                    'Deployment con FastAPI o similar'
+                    'Sesión 1: escribir instrucciones que la IA sigue igual dos veces seguidas, y darle el contexto de tu negocio',
+                    'Sesión 2: conectar la IA a tus herramientas y APIs (los sistemas que ya usas) y dejar piezas reutilizables',
+                    'Sesión 3: pasar de "lo que quiero" a una especificación clara, y conectar la IA a tus documentos para que responda con datos tuyos y no invente',
+                    'Sesión 4: armar el agente, conectarlo a servicios externos y encadenar el flujo completo'
                 ],
-                requisitos: 'Python, Machine Learning',
-                horas: 12
-            },
-            'LLM Fine-tuning & NLP': {
-                sumilla: 'Taller enfocado en personalizar un modelo de lenguaje y construir una aplicación basada en RAG. Los participantes implementarán un chatbot conectado a datos propios.',
-                resultado: 'Chatbot con RAG funcionando',
-                handsOn: [
-                    'Prompt engineering',
-                    'Fine-tuning con LoRA/QLoRA',
-                    'Indexación de documentos',
-                    'Construcción de pipeline RAG'
-                ],
-                requisitos: 'Python, Machine Learning',
+                requisitos: 'Saber programar a nivel básico, manejar Git/GitHub y tener una cuenta de ChatGPT, Claude o Gemini',
+                inicio: '19 de septiembre, 2026',
                 horas: 16
-            },
-            'AI Systems Architecture': {
-                sumilla: 'Taller práctico para diseñar la arquitectura de un sistema de IA listo para producción. Se trabajará sobre un caso empresarial real, definiendo componentes, flujos de datos y decisiones tecnológicas.',
-                resultado: 'Arquitectura completa documentada + diagrama',
-                handsOn: [
-                    'Diseño de arquitectura end-to-end',
-                    'Selección de tecnologías (cloud, APIs, DBs)',
-                    'Definición de escalabilidad y resiliencia',
-                    'Buenas prácticas de AI en producción'
-                ],
-                requisitos: 'Conocimientos básicos de Arquitectura de Software',
-                horas: 16
-            },
-            'Diseño y Despliegue de Agentes IA': {
-                sumilla: 'Taller donde se construyen agentes autónomos capaces de ejecutar tareas complejas. Se implementará un flujo multi-agente conectado a herramientas externas.',
-                resultado: 'Agente funcional ejecutando tareas reales',
-                handsOn: [
-                    'Creación de agentes con LangGraph/CrewAI',
-                    'Integración con APIs/tools',
-                    'Memoria y planificación',
-                    'Orquestación de múltiples agentes'
-                ],
-                requisitos: 'Python',
-                horas: 12
             },
             'Claude Code para Developers': {
-                sumilla: 'Taller intensivo para aprender a usar IA como copiloto de desarrollo. Los participantes construirán una aplicación completa acelerando su desarrollo con herramientas AI.',
-                resultado: 'App funcional desarrollada con AI',
+                sumilla: 'Taller en vivo para equipos técnicos. Se trabaja sobre una tarea real del backlog del participante y se sale con esa tarea resuelta usando Claude Code, no con un ejercicio de ejemplo. También se nombra qué partes del flujo no conviene automatizar todavía.',
+                resultado: 'Una tarea de tu backlog resuelta y en tu repo',
                 handsOn: [
-                    'Generación de código asistido',
-                    'Refactorización automática',
-                    'Integración con APIs',
-                    'Debugging con IA',
-                    'Spec Driven Development'
+                    'Escribir y modificar código real con Claude Code',
+                    'Reordenar código existente sin romperlo',
+                    'Conectar con las APIs que ya usas',
+                    'Encontrar y arreglar errores con ayuda de la IA',
+                    'Partir de una especificación clara antes de escribir código',
+                    'Qué partes del flujo conviene dejar a mano por ahora'
                 ],
-                requisitos: 'Experiencia en desarrollo de software',
-                horas: 12
-            },
-            'Modelos Generativos y Fundacionales': {
-                sumilla: 'Taller práctico donde se exploran modelos generativos mediante implementación directa. Se trabajará con modelos preentrenados para generar texto, imágenes o contenido multimodal.',
-                resultado: 'Aplicación generativa funcional',
-                handsOn: [
-                    'Uso de APIs de modelos generativos',
-                    'Generación de contenido (texto/imágenes)',
-                    'Ajuste de parámetros (temperature, etc.)',
-                    'Integración en una app'
-                ],
-                requisitos: 'Python básico',
+                requisitos: 'Experiencia real desarrollando software',
                 horas: 12
             }
         };
@@ -879,6 +849,13 @@
                         </div>
                     </div>
 
+                    ${data.inicio ? `
+                    <div class="flex items-center gap-4 bg-slate-800/50 p-4 rounded-2xl border border-white/5">
+                        <div class="text-slate-400 text-xs uppercase font-bold">Inicio:</div>
+                        <div class="text-slate-200 text-sm font-medium">${data.inicio}</div>
+                    </div>
+                    ` : ''}
+
                     ${data.requisitos ? `
                     <div class="flex items-center gap-4 bg-slate-800/50 p-4 rounded-2xl border border-white/5">
                         <div class="text-slate-400 text-xs uppercase font-bold">Requisitos:</div>
@@ -908,6 +885,194 @@
         });
 
 
+        /* ============================================================
+           Motion layer — GSAP entrance, scroll reveals, micro-interactions
+           ============================================================ */
+        (function () {
+            const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const body = document.body;
+
+            if (reduce || typeof gsap === 'undefined') {
+                body.classList.remove('js-anim');
+                return;
+            }
+
+            gsap.registerPlugin(ScrollTrigger);
+
+            // --- Hero: staggered entrance on load ---
+            const heroItems = gsap.utils.toArray('[data-hero-stagger] > *');
+            gsap.set(heroItems, { opacity: 0, y: 18 });
+            gsap.set('[data-reveal]', { opacity: 0 });
+
+            window.addEventListener('load', () => {
+                gsap.timeline({ defaults: { ease: 'power2.out' } })
+                    .to(heroItems, { opacity: 1, y: 0, duration: 0.55, stagger: 0.08 }, 0.1)
+                    .fromTo('[data-reveal][data-reveal-from="right"]',
+                        { opacity: 0, x: 32 },
+                        { opacity: 1, x: 0, duration: 0.7 }, 0.25);
+            });
+
+            // --- Scroll reveals ---
+            gsap.utils.toArray('[data-reveal]:not([data-reveal-from])').forEach((el) => {
+                gsap.fromTo(el, { opacity: 0, y: 14 }, {
+                    opacity: 1, y: 0, duration: 0.4, ease: 'power1.out',
+                    scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none reverse' }
+                });
+            });
+
+            // --- Grouped card reveals (small per-item stagger) ---
+            gsap.utils.toArray('[data-reveal-group]').forEach((group) => {
+                const kids = Array.from(group.children);
+                gsap.fromTo(kids,
+                    { opacity: 0, y: 20 },
+                    {
+                        opacity: 1, y: 0, duration: 0.4, ease: 'power1.out', stagger: 0.06,
+                        scrollTrigger: { trigger: group, start: 'top 85%', toggleActions: 'play none none reverse' }
+                    });
+            });
+
+            // --- Card tilt / lift micro-interaction ---
+            gsap.utils.toArray('[data-tilt]').forEach((card) => {
+                const xTo = gsap.quickTo(card, 'rotationY', { duration: 0.4, ease: 'power2.out' });
+                const yTo = gsap.quickTo(card, 'rotationX', { duration: 0.4, ease: 'power2.out' });
+                gsap.set(card, { transformPerspective: 900, transformStyle: 'preserve-3d' });
+
+                card.addEventListener('mouseenter', () => gsap.to(card, { y: -6, duration: 0.25, ease: 'power2.out' }));
+                card.addEventListener('mouseleave', () => {
+                    gsap.to(card, { y: 0, duration: 0.4, ease: 'power2.out' });
+                    xTo(0); yTo(0);
+                });
+                card.addEventListener('mousemove', (e) => {
+                    const r = card.getBoundingClientRect();
+                    const px = (e.clientX - r.left) / r.width - 0.5;
+                    const py = (e.clientY - r.top) / r.height - 0.5;
+                    xTo(px * 6);
+                    yTo(py * -6);
+                });
+            });
+
+            // --- Button press feedback (all primary CTAs) ---
+            gsap.utils.toArray('a[href="#register"], button[type="submit"]').forEach((btn) => {
+                btn.addEventListener('pointerdown', () => gsap.to(btn, { scale: 0.97, duration: 0.1 }));
+                btn.addEventListener('pointerup', () => gsap.to(btn, { scale: 1, duration: 0.25, ease: 'back.out(2)' }));
+                btn.addEventListener('pointerleave', () => gsap.to(btn, { scale: 1, duration: 0.2 }));
+            });
+
+            // --- Magnetic webinar card ---
+            gsap.utils.toArray('[data-magnetic]').forEach((el) => {
+                const mx = gsap.quickTo(el, 'x', { duration: 0.5, ease: 'power3.out' });
+                const my = gsap.quickTo(el, 'y', { duration: 0.5, ease: 'power3.out' });
+                el.addEventListener('mousemove', (e) => {
+                    const r = el.getBoundingClientRect();
+                    mx((e.clientX - r.left - r.width / 2) * 0.06);
+                    my((e.clientY - r.top - r.height / 2) * 0.1);
+                });
+                el.addEventListener('mouseleave', () => { mx(0); my(0); });
+            });
+
+            // Logo mark: brief node "wake up" on load
+            window.addEventListener('load', () => {
+                const nodes = document.querySelectorAll('.logo-mark circle');
+                gsap.fromTo(nodes, { scale: 0, transformOrigin: 'center' },
+                    { scale: 1, duration: 0.5, ease: 'back.out(2.5)', stagger: 0.06, delay: 0.2 });
+            });
+        })();
+
+        /* ============================================================
+           three.js — subtle hero signature: a slow-drifting node lattice
+           echoing the MAGIS mark. Transform/opacity only, capped DPR.
+           ============================================================ */
+        (function () {
+            const canvas = document.getElementById('hero-canvas');
+            if (!canvas || typeof THREE === 'undefined') return;
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            if (window.innerWidth < 640) return; // skip on small screens
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(50, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
+            camera.position.z = 9;
+            camera.position.x = 2.2; // bias the lattice toward the right half (behind the card)
+
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+
+            function size() {
+                const w = canvas.clientWidth, h = canvas.clientHeight;
+                renderer.setSize(w, h, false);
+                camera.aspect = w / h;
+                camera.updateProjectionMatrix();
+            }
+            size();
+
+            const group = new THREE.Group();
+            scene.add(group);
+
+            // Node positions: a loose "M" path in 3D
+            const pts = [
+                [-4.2, -1.6, 0], [-2.4, 1.8, 0.4], [0, -0.4, -0.3],
+                [2.4, 1.8, 0.4], [4.2, -1.6, 0], [0, -1.7, 0.6]
+            ];
+            const nodeGeo = new THREE.SphereGeometry(0.1, 12, 12);
+            const nodeMat = new THREE.MeshBasicMaterial({ color: 0x60a5fa, transparent: true, opacity: 0.5 });
+            const nodes = pts.map(([x, y, z]) => {
+                const m = new THREE.Mesh(nodeGeo, nodeMat);
+                m.position.set(x, y, z);
+                group.add(m);
+                return m;
+            });
+
+            // Connecting lines along the M path
+            const lineMat = new THREE.LineBasicMaterial({ color: 0x8b5cf6, transparent: true, opacity: 0.2 });
+            const order = [0, 1, 2, 3, 4];
+            const lineGeo = new THREE.BufferGeometry().setFromPoints(
+                order.map(i => new THREE.Vector3(...pts[i]))
+            );
+            group.add(new THREE.Line(lineGeo, lineMat));
+
+            // Faint field of far particles
+            const fieldCount = 90;
+            const fieldPos = new Float32Array(fieldCount * 3);
+            for (let i = 0; i < fieldCount; i++) {
+                fieldPos[i * 3] = (Math.random() - 0.5) * 20;
+                fieldPos[i * 3 + 1] = (Math.random() - 0.5) * 12;
+                fieldPos[i * 3 + 2] = (Math.random() - 0.5) * 10 - 4;
+            }
+            const fieldGeo = new THREE.BufferGeometry();
+            fieldGeo.setAttribute('position', new THREE.BufferAttribute(fieldPos, 3));
+            scene.add(new THREE.Points(fieldGeo, new THREE.PointsMaterial({
+                color: 0x3b82f6, size: 0.05, transparent: true, opacity: 0.4
+            })));
+
+            let mx = 0, my = 0, raf, running = true;
+            window.addEventListener('mousemove', (e) => {
+                mx = (e.clientX / window.innerWidth - 0.5);
+                my = (e.clientY / window.innerHeight - 0.5);
+            });
+            window.addEventListener('resize', size);
+
+            // Pause when hero scrolled out of view
+            const hero = canvas.closest('section');
+            const io = new IntersectionObserver(([en]) => {
+                running = en.isIntersecting;
+                if (running) loop();
+            }, { threshold: 0.01 });
+            io.observe(hero);
+
+            const clock = new THREE.Clock();
+            function loop() {
+                if (!running) { cancelAnimationFrame(raf); return; }
+                raf = requestAnimationFrame(loop);
+                const t = clock.getElapsedTime();
+                group.rotation.y += ((mx * 0.5) - group.rotation.y) * 0.03;
+                group.rotation.x += ((my * 0.3) - group.rotation.x) * 0.03;
+                nodes.forEach((n, i) => {
+                    n.position.y = pts[i][1] + Math.sin(t * 0.8 + i) * 0.12;
+                });
+                renderer.render(scene, camera);
+            }
+            setTimeout(() => { canvas.classList.add('ready'); }, 400);
+            requestAnimationFrame(loop);
+        })();
         </script>
 </body>
 
