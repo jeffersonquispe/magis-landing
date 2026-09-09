@@ -698,18 +698,15 @@
             let isValid = true;
             const inputs = form.querySelectorAll('input[required], select[required]');
 
+            const authError = document.getElementById('authError');
+
             inputs.forEach(input => {
                 if (input.type === 'checkbox') {
-                    const errorSpan = document.getElementById('termsError');
                     if (!input.checked) {
                         isValid = false;
-                        errorSpan.classList.add('block');
-                        errorSpan.classList.remove('hidden');
-                        input.parentElement.classList.add('text-red-500');
+                        if (authError) authError.style.display = 'block';
                     } else {
-                        errorSpan.classList.add('hidden');
-                        errorSpan.classList.remove('block');
-                        input.parentElement.classList.remove('text-red-500');
+                        if (authError) authError.style.display = 'none';
                     }
                 } else {
                     if (!input.checkValidity()) {
@@ -737,8 +734,12 @@
                     body: JSON.stringify(data),
                 })
                     .then(async response => {
-                        const result = await response.json();
-                        if (!response.ok) throw new Error(result.error || 'Error desconocido del servidor');
+                        const raw = await response.text();
+                        let result = {};
+                        try { result = raw ? JSON.parse(raw) : {}; } catch (_) { /* non-JSON body */ }
+                        if (!response.ok) {
+                            throw new Error(result.error || `El servidor respondió ${response.status}. Intenta de nuevo o escríbenos por WhatsApp.`);
+                        }
                         return result;
                     })
                     .then(result => {
