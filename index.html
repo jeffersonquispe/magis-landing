@@ -820,11 +820,12 @@
             const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
             const body = document.body;
 
-            if (reduce || typeof gsap === 'undefined') {
+            if (reduce || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
                 body.classList.remove('js-anim');
                 return;
             }
 
+            try {
             gsap.registerPlugin(ScrollTrigger);
 
             // --- Hero: staggered entrance on load ---
@@ -832,13 +833,18 @@
             gsap.set(heroItems, { opacity: 0, y: 18 });
             gsap.set('[data-reveal]', { opacity: 0 });
 
-            window.addEventListener('load', () => {
+            function revealHero() {
                 gsap.timeline({ defaults: { ease: 'power2.out' } })
                     .to(heroItems, { opacity: 1, y: 0, duration: 0.55, stagger: 0.08 }, 0.1)
                     .fromTo('[data-reveal][data-reveal-from="right"]',
                         { opacity: 0, x: 32 },
                         { opacity: 1, x: 0, duration: 0.7 }, 0.25);
-            });
+            }
+            if (document.readyState === 'complete') {
+                revealHero();
+            } else {
+                window.addEventListener('load', revealHero);
+            }
 
             // --- Scroll reveals ---
             gsap.utils.toArray('[data-reveal]:not([data-reveal-from])').forEach((el) => {
@@ -899,11 +905,20 @@
             });
 
             // Logo mark: brief node "wake up" on load
-            window.addEventListener('load', () => {
+            function wakeLogo() {
                 const nodes = document.querySelectorAll('.logo-mark circle');
                 gsap.fromTo(nodes, { scale: 0, transformOrigin: 'center' },
                     { scale: 1, duration: 0.5, ease: 'back.out(2.5)', stagger: 0.06, delay: 0.2 });
-            });
+            }
+            if (document.readyState === 'complete') {
+                wakeLogo();
+            } else {
+                window.addEventListener('load', wakeLogo);
+            }
+            } catch (err) {
+                console.error('Motion layer failed, revealing content without animation:', err);
+                body.classList.remove('js-anim');
+            }
         })();
 
         /* ============================================================
