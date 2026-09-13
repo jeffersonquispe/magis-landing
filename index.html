@@ -587,6 +587,7 @@
     </footer>
 
     <script defer>
+      document.addEventListener('DOMContentLoaded', function () {
         // Initialize Lucide Icons
         lucide.createIcons();
 
@@ -1016,6 +1017,7 @@
             setTimeout(() => { canvas.classList.add('ready'); }, 400);
             requestAnimationFrame(loop);
         })();
+      });
         </script>
 </body>
 
