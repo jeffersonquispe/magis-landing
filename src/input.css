@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Pre-animation state: hide reveal targets so nothing flashes before GSAP runs.
+   Falls back to visible if JS is disabled or reduced-motion is requested. */
+.js-anim [data-reveal],
+.js-anim [data-hero-stagger] > * {
+    opacity: 0;
+    will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .js-anim [data-reveal],
+    .js-anim [data-hero-stagger] > * {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
+
+#hero-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.4s ease;
+    /* keep the lattice off the headline: fade it out on the left third */
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, transparent 34%, rgba(0,0,0,0.5) 48%, #000 65%);
+    mask-image: linear-gradient(to right, transparent 0%, transparent 34%, rgba(0,0,0,0.5) 48%, #000 65%);
+}
+
+#hero-canvas.ready { opacity: 0.4; }
+
+@media (max-width: 1023px) {
+    #hero-canvas { display: none; }
+}
+
+.logo-mark path,
+.logo-mark circle { transition: opacity .2s ease; }
+
+.glass {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hero-gradient {
+    /* logo gradient: violet top-right, cyan bottom-left */
+    background: radial-gradient(circle at top right, rgba(168, 85, 247, 0.14), transparent 60%),
+        radial-gradient(circle at bottom left, rgba(34, 211, 238, 0.10), transparent 55%);
+}
+
+.brand-sweep {
+    background-image: linear-gradient(120deg, #22d3ee 0%, #3b82f6 50%, #a855f7 100%);
+}
+
+.text-sweep {
+    background-image: linear-gradient(120deg, #67e8f9, #60a5fa, #c084fc);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.text-gradient {
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.5);
+}
+
+.error-message {
+    display: none;
+    color: #ef4444;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+input.invalid {
+    border-color: #ef4444;
+}
+
+input.invalid+.error-message {
+    display: block;
+}
